@@ -11,5 +11,5 @@
   "sqliteDataBaseLocation": "C://sqlite/db/",
   "sqliteDataBaseName": "handshake.db",
   "sqliteTableName": "handshakes",
-  "createFiles": true
+  "createFiles": false
 }
