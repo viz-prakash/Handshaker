@@ -1,0 +1,14 @@
+{
+  "protocols": {
+    "_comment": "Verify the TLS/SSH ciphers https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml",
+    "tls": {
+      "TLS_RSA_EXPORT_WITH_DES40_CBC_SHA": "0x00,0x08",
+      "TLS_PSK_WITH_3DES_EDE_CBC_SHA": "0x00,0x8B",
+      "TLS_RSA_WITH_DES_CBC_SHA": "0x00,0x09"
+    }
+  },
+  "inputIpListFilesDir": "./data/",
+  "sqliteDataBaseLocation": "C://sqlite/db/",
+  "sqliteDataBaseName": "handshake.db",
+  "sqliteTableName": "handshakes"
+}
