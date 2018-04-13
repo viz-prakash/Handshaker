@@ -9,7 +9,7 @@
 "sqliteTableName": "handshakes"
 ```
 3. Only few cipher suites are added in protocls, add more if needed.
-4. Install zgrab2 on the system, instructions [here](https://github.com/zmap/zgrab2). Make sure you addd the path to zgrab2 `PATH` variable in linux.
+4. Install zgrab2 on the system, instructions [here](https://github.com/zmap/zgrab2). Make sure you addd the path to zgrab2 in `PATH` variable in linux as` PATH=$PATH:YOUR_PATH_TO_zgrab2`
 4. To build the project there are two ways either use maven or manual build
 
 Manual Build:
