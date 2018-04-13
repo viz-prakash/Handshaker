@@ -10,5 +10,6 @@
   "inputIpListFilesDir": "./data/",
   "sqliteDataBaseLocation": "C://sqlite/db/",
   "sqliteDataBaseName": "handshake.db",
-  "sqliteTableName": "handshakes"
+  "sqliteTableName": "handshakes",
+  "createFiles": true
 }
