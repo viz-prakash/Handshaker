@@ -5,11 +5,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -38,6 +40,7 @@ public class HandshakeScanner {
 	private static final String CONFIG_SQLITE_DB_NAME = "sqliteDataBaseName";
 	private static final String CONFIG_SQLITE_TABLE_NAME = "sqliteTableName";
 	private static final String CONFIG_FILE_CREATION = "createFiles";
+	private static final String CONFIG_ZGRAB_DIR = "zgrabInstalationDir";
 	private static final Logger LOGGER = Logger.getLogger(handshaker.core.HandshakeScanner.class.getName());
 	private static SqliteDataBaseOps sqliteDb = null;
 	private static String tableName = null;
@@ -209,7 +212,7 @@ public class HandshakeScanner {
 					ArrayList<Cipher> cipherResultList = new ArrayList<>();
 					if (LOGGER.isLoggable(Level.FINE)) {
 						LOGGER.fine(MessageFormat.format(
-								"Thread ID: {0}: going to do handsahke for protocol: {1} for ip: {2} ", id, protocol,
+								"Thread ID: {0}: going to do handshake for protocol: {1} for ip: {2} ", id, protocol,
 								ipaddr));
 					}
 					while (ciphersNames.hasNext()) {
@@ -219,7 +222,7 @@ public class HandshakeScanner {
 						String cipherInHex = protocolJsonObject.getString(cipherName);
 						if (LOGGER.isLoggable(Level.FINE)) {
 							LOGGER.fine(MessageFormat.format(
-									"Thread ID: {0}: going to do handsahke for protocol: {1} with cipher: {2}({3}) for ip: {4} ",
+									"Thread ID: {0}: going to do handshake for protocol: {1} with cipher: {2}({3}) for ip: {4} ",
 									id, protocol, cipherInHex, cipherName, ipaddr));
 						}
 						StringBuffer outputBuffer = new StringBuffer();
@@ -231,7 +234,15 @@ public class HandshakeScanner {
 									"Thread ID: {0}: going to execute handshake zgrab2 command: {1}", id, command));
 						}
 
-						childProcess = Runtime.getRuntime().exec(command);
+						String[] cmd = {"/bin/sh", "-c", command};
+						//childProcess = Runtime.getRuntime().exec(cmd);
+						ProcessBuilder pb = new ProcessBuilder(cmd);
+						Map<String, String> env = pb.environment();
+						if (LOGGER.isLoggable(Level.FINE)) {
+						    LOGGER.fine(env.get("PATH"));
+						}
+						env.put("PATH", env.get("PATH") + ":" + config.getString(CONFIG_ZGRAB_DIR));
+						childProcess = pb.start();
 						if (LOGGER.isLoggable(Level.FINE)) {
 							LOGGER.fine(MessageFormat.format("Thread ID: {0}: child process is alive: {1}", id,
 									childProcess.isAlive()));
@@ -240,8 +251,22 @@ public class HandshakeScanner {
 
 						
 						//BufferedReader br = new BufferedReader(new FileReader("result.json"));
-						while ((outputLine = br.readLine()) != null)
-							outputBuffer.append(outputLine);
+						while (true) {
+						    outputLine = br.readLine();
+						    if(outputLine == null)
+						        break;
+						    outputBuffer.append(outputLine);
+						    
+						}
+						BufferedReader brError = new BufferedReader(new InputStreamReader(childProcess.getErrorStream()));
+						StringBuffer errorBuffer = new StringBuffer();
+						while(true) {
+						    outputLine = brError.readLine();
+						    if(outputLine == null) {
+						        break;
+						    }
+						    errorBuffer.append(outputLine);
+						}
 						childProcess.waitFor();
 						if (LOGGER.isLoggable(Level.FINE)) {
 							LOGGER.fine(
@@ -255,6 +280,11 @@ public class HandshakeScanner {
 						// mapper.readValue(outputBuffer.toString(),
 						// Object.class);
 						// cipherResult.setHandshakeData(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json));
+						LOGGER.info("Going to log output" + outputBuffer.toString());
+						if (outputBuffer.toString() == "") {
+						    LOGGER.info("No output");
+						}
+						LOGGER.fine(outputBuffer.toString());
 						cipherResult.setHandshakeData(mapper.readValue(outputBuffer.toString(), Object.class));
 						cipherResultList.add(cipherResult);
 					}
