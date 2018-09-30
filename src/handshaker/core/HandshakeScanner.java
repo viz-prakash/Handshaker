@@ -29,7 +29,7 @@ import handshaker.db.SqliteDataBaseOps;
 
 public class HandshakeScanner {
 
-	private static final String CONFIG_FILE_NAME = "./config/config.json";
+	private static final String CONFIG_FILE_NAME = "../config/config.json";
 	private static final String CONFIG_PROTOCOL = "protocols";
 	private static final String CONFIG_PROTOCOL_COMMENT = "_comment";
 	private static final String CONFIG_PROTOCOL_TLS = "tls";
