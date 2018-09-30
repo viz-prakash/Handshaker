@@ -40,7 +40,7 @@ public class HandshakeScanner {
 	private static final String CONFIG_SQLITE_DB_NAME = "sqliteDataBaseName";
 	private static final String CONFIG_SQLITE_TABLE_NAME = "sqliteTableName";
 	private static final String CONFIG_FILE_CREATION = "createFiles";
-	private static final String CONFIG_ZGRAB_DIR = "zgrabInstalationDir";
+	private static final String CONFIG_ZGRAB_DIR = "zgrabInstallationDir";
 	private static final Logger LOGGER = Logger.getLogger(handshaker.core.HandshakeScanner.class.getName());
 	private static SqliteDataBaseOps sqliteDb = null;
 	private static String tableName = null;
@@ -125,8 +125,7 @@ public class HandshakeScanner {
 				LOGGER.info(MessageFormat.format("Results are going to be written in file: {0}",
 						listOfFiles[i].getAbsolutePath() + RESULT_FILE_SUFFIX));
 				LOGGER.info("Results are also going to be stored in sqlite database.");
-			}
-			else {
+			} else {
 				LOGGER.info("Results are only going to be stored in sqlite database.");
 				handShakeScan = handshakeScanner.new HandShakeScan(ipJsonObjects, configJson, i);
 			}
@@ -234,12 +233,12 @@ public class HandshakeScanner {
 									"Thread ID: {0}: going to execute handshake zgrab2 command: {1}", id, command));
 						}
 
-						String[] cmd = {"/bin/sh", "-c", command};
-						//childProcess = Runtime.getRuntime().exec(cmd);
+						String[] cmd = { "/bin/sh", "-c", command };
+						// childProcess = Runtime.getRuntime().exec(cmd);
 						ProcessBuilder pb = new ProcessBuilder(cmd);
 						Map<String, String> env = pb.environment();
 						if (LOGGER.isLoggable(Level.FINE)) {
-						    LOGGER.fine(env.get("PATH"));
+							LOGGER.fine(env.get("PATH"));
 						}
 						env.put("PATH", env.get("PATH") + ":" + config.getString(CONFIG_ZGRAB_DIR));
 						childProcess = pb.start();
@@ -249,23 +248,26 @@ public class HandshakeScanner {
 						}
 						BufferedReader br = new BufferedReader(new InputStreamReader(childProcess.getInputStream()));
 
-						
-						//BufferedReader br = new BufferedReader(new FileReader("result.json"));
+						// BufferedReader br = new BufferedReader(new FileReader("result.json"));
 						while (true) {
-						    outputLine = br.readLine();
-						    if(outputLine == null)
-						        break;
-						    outputBuffer.append(outputLine);
-						    
+							outputLine = br.readLine();
+							if (outputLine == null) {
+								br.close();
+								break;
+							}
+							outputBuffer.append(outputLine);
+
 						}
-						BufferedReader brError = new BufferedReader(new InputStreamReader(childProcess.getErrorStream()));
+						BufferedReader brError = new BufferedReader(
+								new InputStreamReader(childProcess.getErrorStream()));
 						StringBuffer errorBuffer = new StringBuffer();
-						while(true) {
-						    outputLine = brError.readLine();
-						    if(outputLine == null) {
-						        break;
-						    }
-						    errorBuffer.append(outputLine);
+						while (true) {
+							outputLine = brError.readLine();
+							if (outputLine == null) {
+								brError.close();
+								break;
+							}
+							errorBuffer.append(outputLine);
 						}
 						childProcess.waitFor();
 						if (LOGGER.isLoggable(Level.FINE)) {
@@ -282,7 +284,7 @@ public class HandshakeScanner {
 						// cipherResult.setHandshakeData(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json));
 						LOGGER.info("Going to log output" + outputBuffer.toString());
 						if (outputBuffer.toString() == "") {
-						    LOGGER.info("No output");
+							LOGGER.info("No output");
 						}
 						LOGGER.fine(outputBuffer.toString());
 						cipherResult.setHandshakeData(mapper.readValue(outputBuffer.toString(), Object.class));

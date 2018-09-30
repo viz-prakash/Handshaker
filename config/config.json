@@ -45,5 +45,5 @@
   "sqliteDataBaseName": "desDB.db",
   "sqliteTableName": "handshakes",
   "createFiles": false,
-  "zgrabInstalationDir":"/Users/vanessa/go/src/github.com/zmap/zgrab2/"
+  "zgrabInstallationDir":"/Users/vanessa/go/src/github.com/zmap/zgrab2/"
 }
