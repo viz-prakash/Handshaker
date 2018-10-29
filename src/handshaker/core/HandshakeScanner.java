@@ -322,7 +322,7 @@ public class HandshakeScanner {
 				if(config.getBoolean(CONFIG_OUTPUT_TO_JSON_ONLY) == true)
 				{
 					String outputDirName = config.getString(CONFIG_OUTPUT_FILES_DIR);
-					String fileName = outputDirName + ipaddr; //Craft the output filename (assume outputDirName has a trailing slash)
+					String fileName = outputDirName + ipaddr + ".json"; //Craft the output filename (assume outputDirName has a trailing slash)
 					LOGGER.info("Writting Results for IP " + ipaddr + " to file: " + fileName);
 					writeResultsToJSON(fileName,protocolResultList);
 				}
