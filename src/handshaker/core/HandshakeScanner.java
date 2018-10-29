@@ -1,6 +1,9 @@
 package handshaker.core;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.Writer;
+import java.io.FileWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -35,6 +38,8 @@ public class HandshakeScanner {
 	private static final String CONFIG_PROTOCOL_TLS = "tls";
 	private static final String CONFIG_PROTOCOL_SSH = "ssh";
 	private static final String CONFIG_INPUT_FILES_DIR = "inputIpListFilesDir";
+	private static final String CONFIG_OUTPUT_FILES_DIR = "outputFilesDir"; //Where to output JSON formatted results
+	private static final String CONFIG_OUTPUT_TO_JSON_ONLY = "outputJSONOnly";
 	private static final String RESULT_FILE_SUFFIX = "_handshake.json";
 	private static final String CONFIG_SQLITE_DB_LOCATION = "sqliteDataBaseLocation";
 	private static final String CONFIG_SQLITE_DB_NAME = "sqliteDataBaseName";
@@ -94,8 +99,14 @@ public class HandshakeScanner {
 		String cur_dir = System.getProperty("user.dir");
 		JSONObject configJson = handshakeScanner.configParser();
 		String dirName = configJson.getString(CONFIG_INPUT_FILES_DIR);
+		
 		LOGGER.info(MessageFormat.format(
 				"Provided input directory where files consisting of list of IPs will be scanned is : {0}", dirName));
+		
+		String outputDirName = configJson.getString(CONFIG_OUTPUT_FILES_DIR);
+		LOGGER.info(MessageFormat.format(
+				"Provided output directory where files containing results of scanned IPs is : {0}", outputDirName));
+		
 		File dir = new File(dirName);
 		File[] listOfFiles = dir.listFiles();
 		if (listOfFiles.length == 0) {
@@ -165,6 +176,20 @@ public class HandshakeScanner {
 			this.id = id;
 		}
 
+		public void writeResultsToJSON(String fileName,ArrayList<Protocol> protocolResultList)
+		{
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				String fileContents = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(protocolResultList);
+				BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+				writer.write(fileContents);
+				writer.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		@Override
 		public void run() {
 			try {
@@ -294,12 +319,22 @@ public class HandshakeScanner {
 					protocolResult.setCipherResultList(cipherResultList);
 					protocolResultList.add(protocolResult);
 				}
-				try {
-					ObjectMapper mapper = new ObjectMapper();
-					sqliteDb.insertData(tableName, ipaddr,
-							mapper.writerWithDefaultPrettyPrinter().writeValueAsString(protocolResultList));
-				} catch (SQLException e) {
-					LOGGER.severe(Util.exceptionToStackTraceString(e));
+				if(config.getBoolean(CONFIG_OUTPUT_TO_JSON_ONLY) == true)
+				{
+					String outputDirName = config.getString(CONFIG_OUTPUT_FILES_DIR);
+					String fileName = outputDirName + ipaddr + ".json"; //Craft the output filename (assume outputDirName has a trailing slash)
+					LOGGER.info("Writting Results for IP " + ipaddr + " to file: " + fileName);
+					writeResultsToJSON(fileName,protocolResultList);
+				}
+				else
+				{
+					try {
+						ObjectMapper mapper = new ObjectMapper();
+						sqliteDb.insertData(tableName, ipaddr,
+								mapper.writerWithDefaultPrettyPrinter().writeValueAsString(protocolResultList));
+					} catch (SQLException e) {
+						LOGGER.severe(Util.exceptionToStackTraceString(e));
+					}
 				}
 				if (outputFileName != null) {
 					resultPerIp.setIp(ipaddr);
