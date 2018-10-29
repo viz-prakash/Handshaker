@@ -40,12 +40,12 @@
       "TLS_ECDHE_PSK_WITH_3DES_EDE_CBC_SHA": "0xC0,0x34"
     }
   },
-  "inputIpListFilesDir": "/home/bsimon/scanner-test/input/",
-  "outputFilesDir": "/home/bsimon/scanner-test/output/",
+  "inputIpListFilesDir": "/home/vfrost/my_data_dir/",
+  "outputFilesDir": "/your/output/path/",
   "sqliteDataBaseLocation": "/home/vfrost/",
   "sqliteDataBaseName": "desDB.db",
   "sqliteTableName": "handshakes",
   "createFiles": false,
   "outputJSONOnly": true,
-  "zgrabInstallationDir":"/home/bsimon/go/src/github.com/zmap/zgrab2/"
+  "zgrabInstallationDir":"/home/vfrost/go/src/github.com/zmap/zgrab2/"
 }
