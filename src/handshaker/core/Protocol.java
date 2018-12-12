@@ -5,25 +5,23 @@ import java.util.ArrayList;
 import handshaker.core.Cipher;
 
 public class Protocol {
-	String name;
-	ArrayList<Cipher> cipherResultList;
-	
+    String name;
+    ArrayList<Cipher> cipherResultList;
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public ArrayList<Cipher> getCipherResultList() {
-		return cipherResultList;
-	}
+    public ArrayList<Cipher> getCipherResultList() {
+        return cipherResultList;
+    }
 
-	public void setCipherResultList(ArrayList<Cipher> cipher) {
-		this.cipherResultList = cipher;
-	}
+    public void setCipherResultList(ArrayList<Cipher> cipher) {
+        this.cipherResultList = cipher;
+    }
 
-	
 }

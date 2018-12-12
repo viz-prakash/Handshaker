@@ -7,9 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.SQLException;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -20,13 +18,12 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import org.json.*; // slow library, refactor it to remove it's usage
+// org.json.* is a slow library, refactor it to remove it's usage
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
-import handshaker.Util;
-import handshaker.db.SqliteDataBaseOps;
 
 public class HandshakeScanner {
 
@@ -40,8 +37,6 @@ public class HandshakeScanner {
     private static final String CONFIG_FILE_CREATION = "createFiles";
     private static final String CONFIG_ZGRAB_DIR = "zgrabInstallationDir";
     private static final Logger LOGGER = Logger.getLogger(handshaker.core.HandshakeScanner.class.getName());
-    private static SqliteDataBaseOps sqliteDb = null;
-    private static String tableName = null;
 
     private ArrayList<JSONObject> readInputIPList(File file) throws JSONException, IOException {
         BufferedReader brin = new BufferedReader(new FileReader(file));
@@ -309,14 +304,6 @@ public class HandshakeScanner {
                                                                         // outputDirName has a trailing slash)
                     LOGGER.info("Writting Results for IP " + ipaddr + " to file: " + fileName);
                     writeResultsToJSON(fileName, protocolResultList);
-                } else {
-                    try {
-                        ObjectMapper mapper = new ObjectMapper();
-                        sqliteDb.insertData(tableName, ipaddr,
-                                mapper.writerWithDefaultPrettyPrinter().writeValueAsString(protocolResultList));
-                    } catch (SQLException e) {
-                        LOGGER.severe(Util.exceptionToStackTraceString(e));
-                    }
                 }
                 if (outputFileName != null) {
                     resultPerIp.setIp(ipaddr);
