@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class HandshakeScanner {
 
-    private static final String CONFIG_FILE_NAME = "/Users/vanessa/git/Handshaker/config/config.json";
+    private static final String CONFIG_FILE_NAME = "config/config.json";
     private static final String CONFIG_PROTOCOL = "protocols";
     private static final String CONFIG_PROTOCOL_COMMENT = "_comment";
     private static final String CONFIG_INPUT_FILES_DIR = "inputIpListFilesDir";
@@ -131,6 +131,7 @@ public class HandshakeScanner {
             iter.next().join();
         }
         LOGGER.info("All the threads exited and handshake scanning is done.");
+        System.out.println("File " + " completed.");
     }
 
     public class HandShakeScan implements Runnable {
@@ -179,6 +180,7 @@ public class HandshakeScanner {
                     mapper.enable(SerializationFeature.INDENT_OUTPUT);
                     mapper.writeValue(new File(outputFileName), (Object) result);
                 } else {
+                    // TODO;
                     handshakeScan(ipJsonObjectList, config);
                 }
                 LOGGER.info(MessageFormat.format("Thread ID: {0}: completed handshakes with all the IPs", id));
@@ -220,8 +222,10 @@ public class HandshakeScanner {
                                 "Thread ID: {0}: starting handshake for protocol: {1} for ip: {2} ", id, protocol,
                                 ipaddr));
                     }
+                    
+                    boolean timeout = false;
 
-                    while (ciphersNames.hasNext()) {
+                    while (ciphersNames.hasNext() && !timeout) {
                         Cipher cipherResult = new Cipher();
                         String cipherName = ciphersNames.next();
                         cipherResult.setName(cipherName);
@@ -258,6 +262,7 @@ public class HandshakeScanner {
                         BufferedReader br = new BufferedReader(new InputStreamReader(childProcess.getInputStream()));
 
                         while (true) {
+                            // TODO: line below seemed to take a long time... investigate?
                             outputLine = br.readLine();
                             if (outputLine == null) {
                                 br.close();
@@ -265,6 +270,8 @@ public class HandshakeScanner {
                             }
                             outputBuffer.append(outputLine);
                         }
+
+                        timeout = outputBuffer.indexOf("connection-timeout") != -1;
 
                         BufferedReader brError = new BufferedReader(
                                 new InputStreamReader(childProcess.getErrorStream()));
@@ -285,6 +292,7 @@ public class HandshakeScanner {
                         }
                         childProcess.destroy();
 
+                        // TODO: below line took a long time; investigate
                         ObjectMapper mapper = new ObjectMapper();
                         LOGGER.info("Going to log output" + outputBuffer.toString());
                         if (outputBuffer.toString() == "") {
