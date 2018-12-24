@@ -118,11 +118,11 @@ public class HandshakeScanner {
                 LOGGER.info("Results are also going to be stored in sqlite database.");
             } else {
                 LOGGER.info("Results are only going to be stored in sqlite database.");
-                handShakeScan = handshakeScanner.new HandShakeScan(ipJsonObjects, configJson, i);
+                handShakeScan = handshakeScanner.new HandShakeScan(ipJsonObjects, configJson, i, listOfFiles[i].getAbsolutePath());
             }
             Thread thread = new Thread(handShakeScan);
             thread.start();
-            LOGGER.info(MessageFormat.format("Started thread #: {0}", i));
+            LOGGER.info(MessageFormat.format("Started thread #: {0} on file {1}", i, listOfFiles[i]));
             threads.add(thread);
         }
 
@@ -131,7 +131,6 @@ public class HandshakeScanner {
             iter.next().join();
         }
         LOGGER.info("All the threads exited and handshake scanning is done.");
-        System.out.println("File " + " completed.");
     }
 
     public class HandShakeScan implements Runnable {
@@ -141,6 +140,7 @@ public class HandshakeScanner {
         public JSONObject config;
         public String outputFileName;
         public int id;
+        public String fileName;
 
         public HandShakeScan(ArrayList<JSONObject> ipJsonObjectList, JSONObject config, int id) {
             result = null;
@@ -148,6 +148,15 @@ public class HandshakeScanner {
             this.config = config;
             this.outputFileName = null;
             this.id = id;
+        }
+
+        public HandShakeScan(ArrayList<JSONObject> ipJsonObjectList, JSONObject config, int id, String fileName) {
+            result = null;
+            this.ipJsonObjectList = ipJsonObjectList;
+            this.config = config;
+            this.outputFileName = null;
+            this.id = id;
+            this.fileName = fileName;
         }
 
         public HandShakeScan(ArrayList<JSONObject> ipJsonObjectList, JSONObject config, String outputFileName, int id) {
@@ -183,7 +192,8 @@ public class HandshakeScanner {
                     // TODO;
                     handshakeScan(ipJsonObjectList, config);
                 }
-                LOGGER.info(MessageFormat.format("Thread ID: {0}: completed handshakes with all the IPs", id));
+                LOGGER.info(MessageFormat.format("Thread ID: {0}: completed handshakes with all IPs in {1}", id, fileName));
+                System.out.println("Thread " + id + " finished scanning IPs from " + fileName);
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
