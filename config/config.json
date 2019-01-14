@@ -41,10 +41,7 @@
     }
   },
   "inputIpListFilesDir": "/home/vfrost/my_data_dir/",
-  "outputFilesDir": "/your/output/path/",
-  "sqliteDataBaseLocation": "/home/vfrost/",
-  "sqliteDataBaseName": "desDB.db",
-  "sqliteTableName": "handshakes",
+  "outputFilesDir": "/home/vfrost/my_data_dump/",
   "createFiles": false,
   "outputJSONOnly": true,
   "zgrabInstallationDir":"/home/vfrost/go/src/github.com/zmap/zgrab2/"
