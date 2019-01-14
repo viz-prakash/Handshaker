@@ -195,6 +195,7 @@ public class HandshakeScanner {
                 LOGGER.info(MessageFormat.format("Thread ID: {0}: completed handshakes with all IPs in {1}", id, fileName));
                 System.out.println("Thread " + id + " finished scanning IPs from " + fileName);
             } catch (IOException | InterruptedException e) {
+                System.out.println("Thread " + id + " stopped scanning " + fileName + "due to a memory issue.");
                 e.printStackTrace();
             }
         }
